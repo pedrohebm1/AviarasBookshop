@@ -1,0 +1,11 @@
+﻿@model IEnumerable<AviarasBookshop.Models.Book>
+
+<div id="books-list">
+    <h3>Lista de Livros</h3>
+    <ul>
+        @foreach (var book in Model)
+        {
+            <li>@book.Title - @book.Author</li>
+        }
+    </ul>
+</div>

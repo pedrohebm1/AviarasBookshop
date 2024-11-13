@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div id="books-container">
+</div>
+
+@section Scripts {
+    <script>
+        async function loadBooks() {
+            const response = await fetch('/api/books');
+            const books = await response.json();
+
+            const booksContainer = document.getElementById("books-container");
+            if (books.length > 0) {
+                let html = `<p>Há no total ${books.length} livro(s).</p>`;
+                booksContainer.innerHTML = html;
+            } else {
+                booksContainer.innerHTML = "<p>Não há livros disponíveis.</p>";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadBooks);
+    </script>
+}
