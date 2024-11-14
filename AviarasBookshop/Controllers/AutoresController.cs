@@ -84,6 +84,8 @@ namespace AviarasBookshop.Controllers
             {
                 return NotFound();
             }
+            var countries = await _countryService.GetCountriesAsync();
+            ViewBag.Countries = countries;
             return View(autor);
         }
 
