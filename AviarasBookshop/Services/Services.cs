@@ -30,6 +30,8 @@ namespace AviarasBookshop.Services
                 }
             }
 
+            countries.Sort((x, y) => x.Nationality.CompareTo(y.Nationality));
+
             return countries;
         }
     }
