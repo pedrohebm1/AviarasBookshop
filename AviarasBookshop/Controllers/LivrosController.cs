@@ -19,14 +19,12 @@ namespace AviarasBookshop.Controllers
             _context = context;
         }
 
-        // GET: Livros
         public async Task<IActionResult> Index()
         {
-            var livros = _context.Livros.Include(l => l.Autores); // Inclui autores dos livros
+            var livros = _context.Livros.Include(l => l.Autores);
             return View(await livros.ToListAsync());
         }
 
-        // GET: Livros/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,7 +33,7 @@ namespace AviarasBookshop.Controllers
             }
 
             var livro = await _context.Livros
-                .Include(l => l.Autores) // Inclui os autores do livro
+                .Include(l => l.Autores)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (livro == null)
@@ -46,21 +44,18 @@ namespace AviarasBookshop.Controllers
             return View(livro);
         }
 
-        // GET: Livros/Create
         public IActionResult Create()
         {
             ViewData["Autores"] = new MultiSelectList(_context.Autores, "Id", "Nome");
             return View();
         }
 
-        // POST: Livros/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Titulo,Categoria,Preco")] Livro livro, int[] Autores)
         {
             if (ModelState.IsValid)
             {
-                // Associa os autores selecionados ao livro
                 if (Autores != null && Autores.Length > 0)
                 {
                     livro.Autores = await _context.Autores.Where(a => Autores.Contains(a.Id)).ToListAsync();
@@ -75,7 +70,6 @@ namespace AviarasBookshop.Controllers
             return View(livro);
         }
 
-        // GET: Livros/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -93,7 +87,6 @@ namespace AviarasBookshop.Controllers
             return View(livro);
         }
 
-        // POST: Livros/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Categoria,Preco")] Livro livro, int[] Autores)
@@ -107,7 +100,6 @@ namespace AviarasBookshop.Controllers
             {
                 try
                 {
-                    // Atualiza os autores
                     livro.Autores = await _context.Autores.Where(a => Autores.Contains(a.Id)).ToListAsync();
 
                     _context.Update(livro);
@@ -131,7 +123,6 @@ namespace AviarasBookshop.Controllers
             return View(livro);
         }
 
-        // GET: Livros/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -151,7 +142,6 @@ namespace AviarasBookshop.Controllers
             return View(livro);
         }
 
-        // POST: Livros/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
