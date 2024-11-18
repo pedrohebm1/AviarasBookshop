@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AviarasBookshop.Migrations
 {
     [DbContext(typeof(AviarasBookshopContext))]
-    [Migration("20241113171622_booksum")]
-    partial class booksum
+    [Migration("20241118153807_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,7 +151,6 @@ namespace AviarasBookshop.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LivrosLista")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PrecoTotal")

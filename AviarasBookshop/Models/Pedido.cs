@@ -14,10 +14,6 @@
 
         public Cliente? Cliente { get; set; }
 
-        public int LivroId { get; set; }
-
-        public Livro? Livro { get; set; }
-
         public ICollection<Livro>? Livros { get; set; }
 
         

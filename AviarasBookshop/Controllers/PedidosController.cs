@@ -22,8 +22,10 @@ namespace AviarasBookshop.Controllers
         // GET: Pedidos
         public async Task<IActionResult> Index()
         {
-            var aviarasBookshopContext = _context.Pedidos.Include(p => p.Cliente).Include(p => p.Livro);
-            return View(await aviarasBookshopContext.ToListAsync());
+            var pedidos = _context.Pedidos
+                .Include(p => p.Cliente)
+                .Include(p => p.Livros); // Inclui os livros no pedido
+            return View(await pedidos.ToListAsync());
         }
 
         // GET: Pedidos/Details/5
@@ -36,8 +38,9 @@ namespace AviarasBookshop.Controllers
 
             var pedido = await _context.Pedidos
                 .Include(p => p.Cliente)
-                .Include(p => p.Livro)
+                .Include(p => p.Livros) // Inclui os livros no pedido
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (pedido == null)
             {
                 return NotFound();
@@ -50,25 +53,27 @@ namespace AviarasBookshop.Controllers
         public IActionResult Create()
         {
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome");
-            ViewData["LivroId"] = new SelectList(_context.Livros, "Id", "Titulo");
+            ViewData["Livros"] = new MultiSelectList(_context.Livros, "Id", "Titulo"); // Preenche os livros disponíveis
             return View();
         }
 
         // POST: Pedidos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Status,PrecoTotal,LivrosLista,ClienteId,LivroId")] Pedido pedido)
+        public async Task<IActionResult> Create([Bind("Id,Status,PrecoTotal,LivrosLista,ClienteId")] Pedido pedido, int[] livroIds)
         {
             if (ModelState.IsValid)
             {
+                // Associa os livros selecionados ao pedido
+                pedido.Livros = await _context.Livros.Where(l => livroIds.Contains(l.Id)).ToListAsync();
+
                 _context.Add(pedido);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["LivroId"] = new SelectList(_context.Livros, "Id", "Titulo", pedido.LivroId);
+            ViewData["Livros"] = new MultiSelectList(_context.Livros, "Id", "Titulo", livroIds);
             return View(pedido);
         }
 
@@ -80,22 +85,24 @@ namespace AviarasBookshop.Controllers
                 return NotFound();
             }
 
-            var pedido = await _context.Pedidos.FindAsync(id);
+            var pedido = await _context.Pedidos
+                .Include(p => p.Livros) // Carrega os livros associados
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (pedido == null)
             {
                 return NotFound();
             }
+
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["LivroId"] = new SelectList(_context.Livros, "Id", "Titulo", pedido.LivroId);
+            ViewData["Livros"] = new MultiSelectList(_context.Livros, "Id", "Titulo", pedido.Livros.Select(l => l.Id));
             return View(pedido);
         }
 
         // POST: Pedidos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Status,PrecoTotal,LivrosLista,ClienteId,LivroId")] Pedido pedido)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Status,PrecoTotal,LivrosLista,ClienteId")] Pedido pedido, int[] livroIds)
         {
             if (id != pedido.Id)
             {
@@ -106,7 +113,25 @@ namespace AviarasBookshop.Controllers
             {
                 try
                 {
-                    _context.Update(pedido);
+                    // Atualiza os dados do pedido
+                    var existingPedido = await _context.Pedidos
+                        .Include(p => p.Livros)
+                        .FirstOrDefaultAsync(p => p.Id == id);
+
+                    if (existingPedido == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Atualiza os livros associados
+                    existingPedido.Livros.Clear();
+                    existingPedido.Livros = await _context.Livros.Where(l => livroIds.Contains(l.Id)).ToListAsync();
+
+                    existingPedido.Status = pedido.Status;
+                    existingPedido.PrecoTotal = pedido.PrecoTotal;
+                    existingPedido.ClienteId = pedido.ClienteId;
+
+                    _context.Update(existingPedido);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -122,8 +147,9 @@ namespace AviarasBookshop.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["LivroId"] = new SelectList(_context.Livros, "Id", "Titulo", pedido.LivroId);
+            ViewData["Livros"] = new MultiSelectList(_context.Livros, "Id", "Titulo", livroIds);
             return View(pedido);
         }
 
@@ -137,8 +163,9 @@ namespace AviarasBookshop.Controllers
 
             var pedido = await _context.Pedidos
                 .Include(p => p.Cliente)
-                .Include(p => p.Livro)
+                .Include(p => p.Livros) // Inclui os livros no pedido
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (pedido == null)
             {
                 return NotFound();
@@ -152,13 +179,17 @@ namespace AviarasBookshop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
+            var pedido = await _context.Pedidos
+                .Include(p => p.Livros)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (pedido != null)
             {
+                // Remove o pedido
                 _context.Pedidos.Remove(pedido);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

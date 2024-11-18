@@ -5,55 +5,10 @@
 namespace AviarasBookshop.Migrations
 {
     /// <inheritdoc />
-    public partial class booksum : Migration
+    public partial class update_pedidos : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "PedidoLivro");
-
-            migrationBuilder.AddColumn<int>(
-                name: "LivroId",
-                table: "Pedidos",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-
-            migrationBuilder.AddColumn<int>(
-                name: "PedidoId",
-                table: "Livros",
-                type: "int",
-                nullable: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pedidos_LivroId",
-                table: "Pedidos",
-                column: "LivroId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Livros_PedidoId",
-                table: "Livros",
-                column: "PedidoId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Livros_Pedidos_PedidoId",
-                table: "Livros",
-                column: "PedidoId",
-                principalTable: "Pedidos",
-                principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Pedidos_Livros_LivroId",
-                table: "Pedidos",
-                column: "LivroId",
-                principalTable: "Livros",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Livros_Pedidos_PedidoId",
@@ -107,6 +62,51 @@ namespace AviarasBookshop.Migrations
                 name: "IX_PedidoLivro_PedidosId",
                 table: "PedidoLivro",
                 column: "PedidosId");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "PedidoLivro");
+
+            migrationBuilder.AddColumn<int>(
+                name: "LivroId",
+                table: "Pedidos",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
+                name: "PedidoId",
+                table: "Livros",
+                type: "int",
+                nullable: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pedidos_LivroId",
+                table: "Pedidos",
+                column: "LivroId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Livros_PedidoId",
+                table: "Livros",
+                column: "PedidoId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Livros_Pedidos_PedidoId",
+                table: "Livros",
+                column: "PedidoId",
+                principalTable: "Pedidos",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Pedidos_Livros_LivroId",
+                table: "Pedidos",
+                column: "LivroId",
+                principalTable: "Livros",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
     }
 }

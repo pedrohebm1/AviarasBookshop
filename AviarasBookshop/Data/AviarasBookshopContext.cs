@@ -37,9 +37,9 @@ namespace AviarasBookshop.Data
             //.UsingEntity(ntable => ntable.ToTable("PedidoLivro"));
 
             modelBuilder.Entity<Pedido>()
-                .HasOne(r => r.Livro)
-                .WithMany(c => c.Pedidos)
-                .HasForeignKey(r => r.LivroId);
+                .HasMany(p => p.Livros)
+                .WithMany(l => l.Pedidos)
+                .UsingEntity(j => j.ToTable("PedidoLivro"));
 
             modelBuilder.Entity<Pedido>()
                 .HasOne(r => r.Cliente)
