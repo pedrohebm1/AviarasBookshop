@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<AviarasBookshop.Models.Livro>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Livros";
 }
 
 <h1>Livros</h1>
@@ -12,42 +12,25 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Titulo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Categoria)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Preco)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Autor)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.Titulo)</th>
+            <th>@Html.DisplayNameFor(model => model.Categoria)</th>
+            <th>@Html.DisplayNameFor(model => model.Preco)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Titulo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categoria)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Preco)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Autor.Nome)
-            </td>
-            <td>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Titulo)</td>
+                <td>@Html.DisplayFor(modelItem => item.Categoria)</td>
+                <td>@Html.DisplayFor(modelItem => item.Preco)</td>
+                <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Excluir</a>
-            </td>
-        </tr>
-}
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

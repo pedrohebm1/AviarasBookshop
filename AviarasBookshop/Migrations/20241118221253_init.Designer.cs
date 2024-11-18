@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AviarasBookshop.Migrations
 {
     [DbContext(typeof(AviarasBookshopContext))]
-    [Migration("20241118153807_init")]
+    [Migration("20241118221253_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -25,6 +25,21 @@ namespace AviarasBookshop.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AutorLivro", b =>
+                {
+                    b.Property<int>("AutoresId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LivrosId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AutoresId", "LivrosId");
+
+                    b.HasIndex("LivrosId");
+
+                    b.ToTable("LivroAutor", (string)null);
+                });
+
             modelBuilder.Entity("AviarasBookshop.Models.Autor", b =>
                 {
                     b.Property<int>("Id")
@@ -32,6 +47,9 @@ namespace AviarasBookshop.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AutorId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("DataNascimento")
                         .HasColumnType("datetime2");
@@ -45,6 +63,8 @@ namespace AviarasBookshop.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
 
                     b.ToTable("Autores");
                 });
@@ -110,15 +130,9 @@ namespace AviarasBookshop.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AutorId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Categoria")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PedidoId")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("Preco")
                         .HasColumnType("decimal(18,2)");
@@ -128,10 +142,6 @@ namespace AviarasBookshop.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AutorId");
-
-                    b.HasIndex("PedidoId");
 
                     b.ToTable("Livros");
                 });
@@ -147,9 +157,6 @@ namespace AviarasBookshop.Migrations
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
 
-                    b.Property<int>("LivroId")
-                        .HasColumnType("int");
-
                     b.Property<string>("LivrosLista")
                         .HasColumnType("nvarchar(max)");
 
@@ -163,8 +170,6 @@ namespace AviarasBookshop.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("LivroId");
 
                     b.ToTable("Pedidos");
                 });
@@ -184,19 +189,41 @@ namespace AviarasBookshop.Migrations
                     b.ToTable("ClienteLivro", (string)null);
                 });
 
-            modelBuilder.Entity("AviarasBookshop.Models.Livro", b =>
+            modelBuilder.Entity("LivroPedido", b =>
                 {
-                    b.HasOne("AviarasBookshop.Models.Autor", "Autor")
-                        .WithMany("Livros")
-                        .HasForeignKey("AutorId")
+                    b.Property<int>("LivrosId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PedidosId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LivrosId", "PedidosId");
+
+                    b.HasIndex("PedidosId");
+
+                    b.ToTable("PedidoLivro", (string)null);
+                });
+
+            modelBuilder.Entity("AutorLivro", b =>
+                {
+                    b.HasOne("AviarasBookshop.Models.Autor", null)
+                        .WithMany()
+                        .HasForeignKey("AutoresId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AviarasBookshop.Models.Pedido", null)
-                        .WithMany("Livros")
-                        .HasForeignKey("PedidoId");
+                    b.HasOne("AviarasBookshop.Models.Livro", null)
+                        .WithMany()
+                        .HasForeignKey("LivrosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Navigation("Autor");
+            modelBuilder.Entity("AviarasBookshop.Models.Autor", b =>
+                {
+                    b.HasOne("AviarasBookshop.Models.Autor", null)
+                        .WithMany("Autores")
+                        .HasForeignKey("AutorId");
                 });
 
             modelBuilder.Entity("AviarasBookshop.Models.Pedido", b =>
@@ -207,15 +234,7 @@ namespace AviarasBookshop.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AviarasBookshop.Models.Livro", "Livro")
-                        .WithMany("Pedidos")
-                        .HasForeignKey("LivroId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Cliente");
-
-                    b.Navigation("Livro");
                 });
 
             modelBuilder.Entity("ClienteLivro", b =>
@@ -233,24 +252,29 @@ namespace AviarasBookshop.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("LivroPedido", b =>
+                {
+                    b.HasOne("AviarasBookshop.Models.Livro", null)
+                        .WithMany()
+                        .HasForeignKey("LivrosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AviarasBookshop.Models.Pedido", null)
+                        .WithMany()
+                        .HasForeignKey("PedidosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("AviarasBookshop.Models.Autor", b =>
                 {
-                    b.Navigation("Livros");
+                    b.Navigation("Autores");
                 });
 
             modelBuilder.Entity("AviarasBookshop.Models.Cliente", b =>
                 {
                     b.Navigation("Pedidos");
-                });
-
-            modelBuilder.Entity("AviarasBookshop.Models.Livro", b =>
-                {
-                    b.Navigation("Pedidos");
-                });
-
-            modelBuilder.Entity("AviarasBookshop.Models.Pedido", b =>
-                {
-                    b.Navigation("Livros");
                 });
 #pragma warning restore 612, 618
         }

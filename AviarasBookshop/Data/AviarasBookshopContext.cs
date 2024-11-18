@@ -19,22 +19,16 @@ namespace AviarasBookshop.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configuração para relacionamento N:M entre Autor e Livro
+            
             modelBuilder.Entity<Livro>()
-                .HasOne(l => l.Autor)
+                .HasMany(l => l.Autores)
                 .WithMany(a => a.Livros)
-                .HasForeignKey(j => j.AutorId);
+                .UsingEntity(j => j.ToTable("LivroAutor"));
 
-            // Outras configurações para relacionamento N:M entre Cliente e Livro, Pedido e Livro
             modelBuilder.Entity<Cliente>()
                 .HasMany(l => l.Livros)
                 .WithMany(c => c.Clientes)
                 .UsingEntity(ntable => ntable.ToTable("ClienteLivro"));
-
-            // modelBuilder.Entity<Pedido>()
-            //.HasMany(l => l.Livros)
-            //.WithMany(p => p.Pedidos)
-            //.UsingEntity(ntable => ntable.ToTable("PedidoLivro"));
 
             modelBuilder.Entity<Pedido>()
                 .HasMany(p => p.Livros)

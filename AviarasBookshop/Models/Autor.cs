@@ -9,6 +9,8 @@
 
         // Many-to-many relationship with Livro
 
+        public ICollection<Autor>? Autores { get; set; }
+
         public ICollection<Livro>? Livros { get; set; }
     }
 }

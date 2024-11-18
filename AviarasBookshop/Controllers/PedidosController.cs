@@ -67,7 +67,6 @@ namespace AviarasBookshop.Controllers
                 // Associa os livros selecionados ao pedido
                 pedido.Livros = await _context.Livros.Where(l => Livros.Contains(l.Id)).ToListAsync();
 
-                Console.WriteLine("Lista de ids ///////////////");
                 foreach (int number in Livros)
                 {
                     Console.WriteLine(number);

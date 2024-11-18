@@ -7,11 +7,7 @@
         public string Categoria { get; set; }
         public decimal Preco { get; set; }
 
-        public int AutorId { get; set; }
-
-        public Autor? Autor { get; set; }
-
-        // Many-to-many relationship with Autor
+        public ICollection<Autor>? Autores { get; set; }
 
         public ICollection<Cliente>? Clientes { get; set; }
         public ICollection<Pedido>? Pedidos { get; set; }

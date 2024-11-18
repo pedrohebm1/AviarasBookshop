@@ -22,8 +22,8 @@ namespace AviarasBookshop.Controllers
         // GET: Livros
         public async Task<IActionResult> Index()
         {
-            var aviarasBookshopContext = _context.Livros.Include(l => l.Autor);
-            return View(await aviarasBookshopContext.ToListAsync());
+            var livros = _context.Livros.Include(l => l.Autores); // Inclui autores dos livros
+            return View(await livros.ToListAsync());
         }
 
         // GET: Livros/Details/5
@@ -35,8 +35,9 @@ namespace AviarasBookshop.Controllers
             }
 
             var livro = await _context.Livros
-                .Include(l => l.Autor)
+                .Include(l => l.Autores) // Inclui os autores do livro
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (livro == null)
             {
                 return NotFound();
@@ -48,24 +49,29 @@ namespace AviarasBookshop.Controllers
         // GET: Livros/Create
         public IActionResult Create()
         {
-            ViewData["AutorId"] = new SelectList(_context.Autores, "Id", "Nome");
+            ViewData["Autores"] = new MultiSelectList(_context.Autores, "Id", "Nome");
             return View();
         }
 
         // POST: Livros/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Titulo,Categoria,Preco,AutorId")] Livro livro)
+        public async Task<IActionResult> Create([Bind("Id,Titulo,Categoria,Preco")] Livro livro, int[] Autores)
         {
             if (ModelState.IsValid)
             {
+                // Associa os autores selecionados ao livro
+                if (Autores != null && Autores.Length > 0)
+                {
+                    livro.Autores = await _context.Autores.Where(a => Autores.Contains(a.Id)).ToListAsync();
+                }
+
                 _context.Add(livro);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AutorId"] = new SelectList(_context.Autores, "Id", "Nome");
+
+            ViewData["Autores"] = new MultiSelectList(_context.Autores, "Id", "Nome", Autores);
             return View(livro);
         }
 
@@ -82,16 +88,15 @@ namespace AviarasBookshop.Controllers
             {
                 return NotFound();
             }
-            ViewData["AutorId"] = new SelectList(_context.Autores, "Id", "Nome", livro.AutorId);
+
+            ViewData["Autores"] = new MultiSelectList(_context.Autores, "Id", "Nome", livro.Autores.Select(a => a.Id));
             return View(livro);
         }
 
         // POST: Livros/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Categoria,Preco,AutorId")] Livro livro)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Categoria,Preco")] Livro livro, int[] Autores)
         {
             if (id != livro.Id)
             {
@@ -102,6 +107,9 @@ namespace AviarasBookshop.Controllers
             {
                 try
                 {
+                    // Atualiza os autores
+                    livro.Autores = await _context.Autores.Where(a => Autores.Contains(a.Id)).ToListAsync();
+
                     _context.Update(livro);
                     await _context.SaveChangesAsync();
                 }
@@ -118,7 +126,8 @@ namespace AviarasBookshop.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AutorId"] = new SelectList(_context.Autores, "Id", "Nome", livro.AutorId);
+
+            ViewData["Autores"] = new MultiSelectList(_context.Autores, "Id", "Nome", livro.Autores.Select(a => a.Id));
             return View(livro);
         }
 
@@ -131,8 +140,9 @@ namespace AviarasBookshop.Controllers
             }
 
             var livro = await _context.Livros
-                .Include(l => l.Autor)
+                .Include(l => l.Autores)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (livro == null)
             {
                 return NotFound();

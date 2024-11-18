@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AviarasBookshop.Migrations
 {
     [DbContext(typeof(AviarasBookshopContext))]
-    [Migration("20241118161007_update_pedidos")]
-    partial class update_pedidos
+    [Migration("20241118221418_update_autores")]
+    partial class update_autores
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,21 @@ namespace AviarasBookshop.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AutorLivro", b =>
+                {
+                    b.Property<int>("AutoresId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LivrosId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AutoresId", "LivrosId");
+
+                    b.HasIndex("LivrosId");
+
+                    b.ToTable("LivroAutor", (string)null);
+                });
+
             modelBuilder.Entity("AviarasBookshop.Models.Autor", b =>
                 {
                     b.Property<int>("Id")
@@ -32,6 +47,9 @@ namespace AviarasBookshop.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AutorId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("DataNascimento")
                         .HasColumnType("datetime2");
@@ -45,6 +63,8 @@ namespace AviarasBookshop.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
 
                     b.ToTable("Autores");
                 });
@@ -110,9 +130,6 @@ namespace AviarasBookshop.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AutorId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Categoria")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -125,8 +142,6 @@ namespace AviarasBookshop.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AutorId");
 
                     b.ToTable("Livros");
                 });
@@ -189,15 +204,26 @@ namespace AviarasBookshop.Migrations
                     b.ToTable("PedidoLivro", (string)null);
                 });
 
-            modelBuilder.Entity("AviarasBookshop.Models.Livro", b =>
+            modelBuilder.Entity("AutorLivro", b =>
                 {
-                    b.HasOne("AviarasBookshop.Models.Autor", "Autor")
-                        .WithMany("Livros")
-                        .HasForeignKey("AutorId")
+                    b.HasOne("AviarasBookshop.Models.Autor", null)
+                        .WithMany()
+                        .HasForeignKey("AutoresId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Autor");
+                    b.HasOne("AviarasBookshop.Models.Livro", null)
+                        .WithMany()
+                        .HasForeignKey("LivrosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AviarasBookshop.Models.Autor", b =>
+                {
+                    b.HasOne("AviarasBookshop.Models.Autor", null)
+                        .WithMany("Autores")
+                        .HasForeignKey("AutorId");
                 });
 
             modelBuilder.Entity("AviarasBookshop.Models.Pedido", b =>
@@ -243,7 +269,7 @@ namespace AviarasBookshop.Migrations
 
             modelBuilder.Entity("AviarasBookshop.Models.Autor", b =>
                 {
-                    b.Navigation("Livros");
+                    b.Navigation("Autores");
                 });
 
             modelBuilder.Entity("AviarasBookshop.Models.Cliente", b =>

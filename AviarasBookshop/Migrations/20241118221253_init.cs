@@ -19,11 +19,17 @@ namespace AviarasBookshop.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DataNascimento = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Nacionalidade = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Nacionalidade = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AutorId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Autores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Autores_Autores_AutorId",
+                        column: x => x.AutorId,
+                        principalTable: "Autores",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -58,6 +64,43 @@ namespace AviarasBookshop.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Livros",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Titulo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Preco = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Livros", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pedidos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PrecoTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LivrosLista = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClienteId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pedidos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Pedidos_Clientes_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Clientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClienteLivro",
                 columns: table => new
                 {
@@ -73,59 +116,66 @@ namespace AviarasBookshop.Migrations
                         principalTable: "Clientes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Livros",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Titulo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Categoria = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Preco = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AutorId = table.Column<int>(type: "int", nullable: false),
-                    PedidoId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Livros", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Livros_Autores_AutorId",
-                        column: x => x.AutorId,
-                        principalTable: "Autores",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pedidos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PrecoTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    LivrosLista = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClienteId = table.Column<int>(type: "int", nullable: false),
-                    LivroId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pedidos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pedidos_Clientes_ClienteId",
-                        column: x => x.ClienteId,
-                        principalTable: "Clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Pedidos_Livros_LivroId",
-                        column: x => x.LivroId,
+                        name: "FK_ClienteLivro_Livros_LivrosId",
+                        column: x => x.LivrosId,
                         principalTable: "Livros",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "LivroAutor",
+                columns: table => new
+                {
+                    AutoresId = table.Column<int>(type: "int", nullable: false),
+                    LivrosId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LivroAutor", x => new { x.AutoresId, x.LivrosId });
+                    table.ForeignKey(
+                        name: "FK_LivroAutor_Autores_AutoresId",
+                        column: x => x.AutoresId,
+                        principalTable: "Autores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LivroAutor_Livros_LivrosId",
+                        column: x => x.LivrosId,
+                        principalTable: "Livros",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PedidoLivro",
+                columns: table => new
+                {
+                    LivrosId = table.Column<int>(type: "int", nullable: false),
+                    PedidosId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PedidoLivro", x => new { x.LivrosId, x.PedidosId });
+                    table.ForeignKey(
+                        name: "FK_PedidoLivro_Livros_LivrosId",
+                        column: x => x.LivrosId,
+                        principalTable: "Livros",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PedidoLivro_Pedidos_PedidosId",
+                        column: x => x.PedidosId,
+                        principalTable: "Pedidos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Autores_AutorId",
+                table: "Autores",
+                column: "AutorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClienteLivro_LivrosId",
@@ -133,52 +183,24 @@ namespace AviarasBookshop.Migrations
                 column: "LivrosId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Livros_AutorId",
-                table: "Livros",
-                column: "AutorId");
+                name: "IX_LivroAutor_LivrosId",
+                table: "LivroAutor",
+                column: "LivrosId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Livros_PedidoId",
-                table: "Livros",
-                column: "PedidoId");
+                name: "IX_PedidoLivro_PedidosId",
+                table: "PedidoLivro",
+                column: "PedidosId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pedidos_ClienteId",
                 table: "Pedidos",
                 column: "ClienteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pedidos_LivroId",
-                table: "Pedidos",
-                column: "LivroId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_ClienteLivro_Livros_LivrosId",
-                table: "ClienteLivro",
-                column: "LivrosId",
-                principalTable: "Livros",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Livros_Pedidos_PedidoId",
-                table: "Livros",
-                column: "PedidoId",
-                principalTable: "Pedidos",
-                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Pedidos_Clientes_ClienteId",
-                table: "Pedidos");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Pedidos_Livros_LivroId",
-                table: "Pedidos");
-
             migrationBuilder.DropTable(
                 name: "Books");
 
@@ -186,16 +208,22 @@ namespace AviarasBookshop.Migrations
                 name: "ClienteLivro");
 
             migrationBuilder.DropTable(
-                name: "Clientes");
+                name: "LivroAutor");
 
             migrationBuilder.DropTable(
-                name: "Livros");
+                name: "PedidoLivro");
 
             migrationBuilder.DropTable(
                 name: "Autores");
 
             migrationBuilder.DropTable(
+                name: "Livros");
+
+            migrationBuilder.DropTable(
                 name: "Pedidos");
+
+            migrationBuilder.DropTable(
+                name: "Clientes");
         }
     }
 }

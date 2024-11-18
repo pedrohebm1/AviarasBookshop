@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Cadastrar livro</h1>
+<h1>Cadastrar Livro</h1>
 
 <h4>Livro</h4>
 <hr />
@@ -12,26 +12,30 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="Titulo" class="control-label"></label>
                 <input asp-for="Titulo" class="form-control" />
                 <span asp-validation-for="Titulo" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Categoria" class="control-label"></label>
                 <input asp-for="Categoria" class="form-control" />
                 <span asp-validation-for="Categoria" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Preco" class="control-label"></label>
                 <input asp-for="Preco" class="form-control" type="number" step="0.01" min="0" />
                 <span asp-validation-for="Preco" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="AutorId" class="control-label"></label>
-                <select asp-for="AutorId" class="form-control" asp-items="ViewBag.AutorId"></select>
-                <span asp-validation-for="AutorId" class="text-danger"></span>
+                <label for="Autores">Selecione os autores</label>
+                <select asp-for="Autores" asp-items="ViewBag.Autores" class="form-control" multiple></select>
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
