@@ -33,13 +33,17 @@ namespace AviarasBookshop.Controllers
                 return NotFound();
             }
 
+            // Carrega o cliente com os pedidos associados
             var cliente = await _context.Clientes
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(c => c.Pedidos)  // Carrega os pedidos associados ao cliente
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (cliente == null)
             {
                 return NotFound();
             }
 
+            // Retorna a view com o cliente e seus pedidos
             return View(cliente);
         }
 

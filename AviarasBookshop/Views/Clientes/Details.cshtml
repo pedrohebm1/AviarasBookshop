@@ -29,6 +29,9 @@
             @Html.DisplayFor(model => model.NumeroTelefone)
         </dd>
     </dl>
+    @{
+        Html.RenderPartial("_PedidosCliente", Model.Pedidos);
+    }
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Editar</a> |

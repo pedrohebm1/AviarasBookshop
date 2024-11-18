@@ -1,0 +1,27 @@
+﻿@model IEnumerable<AviarasBookshop.Models.Pedido>
+
+<h3>Pedidos do Cliente</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Pedido ID</th>
+            <th>Status</th>
+            <th>Preço Total</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pedido in Model)
+        {
+            <tr>
+                <td>@pedido.Id</td>
+                <td>@pedido.Status</td>
+                <td>@pedido.PrecoTotal</td>
+                <td>
+                    <a href="@Url.Action("Details", "Pedidos", new { id = pedido.Id })" class="btn btn-primary">Detalhes</a>
+                    <a href="@Url.Action("Delete", "Pedidos", new { id = pedido.Id })" class="btn btn-primary">Deletar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
