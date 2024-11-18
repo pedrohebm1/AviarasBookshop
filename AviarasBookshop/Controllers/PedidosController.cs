@@ -60,12 +60,19 @@ namespace AviarasBookshop.Controllers
         // POST: Pedidos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Status,PrecoTotal,LivrosLista,ClienteId")] Pedido pedido, int[] livroIds)
+        public async Task<IActionResult> Create([Bind("Id,Status,PrecoTotal,LivrosLista,ClienteId")] Pedido pedido, int[] Livros)
         {
             if (ModelState.IsValid)
             {
                 // Associa os livros selecionados ao pedido
-                pedido.Livros = await _context.Livros.Where(l => livroIds.Contains(l.Id)).ToListAsync();
+                pedido.Livros = await _context.Livros.Where(l => Livros.Contains(l.Id)).ToListAsync();
+
+                Console.WriteLine("Lista de ids ///////////////");
+                foreach (int number in Livros)
+                {
+                    Console.WriteLine(number);
+                }
+
 
                 _context.Add(pedido);
                 await _context.SaveChangesAsync();
@@ -73,7 +80,7 @@ namespace AviarasBookshop.Controllers
             }
 
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["Livros"] = new MultiSelectList(_context.Livros, "Id", "Titulo", livroIds);
+            ViewData["Livros"] = new MultiSelectList(_context.Livros, "Id", "Titulo", Livros);
             return View(pedido);
         }
 
